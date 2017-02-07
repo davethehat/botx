@@ -9,6 +9,7 @@
   "author": "david.harvey@teamsandtechnology.com",
   "license": "ISC",
   "dependencies": {
-    "botkit": "^0.4.10"
+    "botkit": "^0.4.10",
+    "scrape": "^0.2.3"
   }
 }
