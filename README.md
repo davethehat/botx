@@ -49,3 +49,6 @@ function main() {
 ```
 
 That's all it takes...
+
+Note you will need to place youe Slack API token in the environment *SLACK_API_TOKEN*
+
