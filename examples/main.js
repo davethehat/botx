@@ -33,7 +33,7 @@ function main() {
     .otherwise('Well, maybe there\'s hope for me yet')
     .create();
 
-  bot.when('good')
+  bot.when('^good')
     .thenStartConversation(areWeGood)
     .go();
 
