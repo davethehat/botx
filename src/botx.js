@@ -1,7 +1,4 @@
-if (!process.env.token) {
-  console.log('Error: Specify token in environment');
-  process.exit(1);
-}
+'use strict';
 
 var os = require('os');
 
@@ -27,13 +24,13 @@ function botx(userConfig = {}) {
   let controller = Botkit.slackbot(config);
  
   let bot = controller.spawn({
-    token: process.env.token
+    token: config.token
   }).startRTM();
 
   let wrappedBot = {
     controller: controller,
     bot: bot,
-    whenBotHears(pattern) {
+    when(pattern) {
       return builder(this, pattern);
     },
     conversation() {
@@ -61,7 +58,7 @@ function installShutdownConversation(wrappedBot, shutdownConfig) {
     .otherwise(shutdownConfig.onNo)
     .create();
 
-  wrappedBot.whenBotHears(shutdownConfig.trigger)
+  wrappedBot.when(shutdownConfig.trigger)
     .thenStartConversation(quitConversation)
     .go();
 }
@@ -71,15 +68,18 @@ function builder(botx, pattern) {
     botx: botx,
     patterns: [pattern],
     responses: [],
-    orBotHears(anotherPattern) {
+
+    or(anotherPattern) {
       this.patterns.push(anotherPattern);
       return this;
     },
+
     then(fn) {
       this.responses.push(fn);
       return this;
     },
-    thenReply(what) {
+
+    thenSay(what) {
       return this.then(function(bot, message) {
         let response = what;
         for (let matchIndex = 1; matchIndex <= message.match.length; matchIndex++) {
@@ -95,15 +95,14 @@ function builder(botx, pattern) {
     },
 
     go() {
-      let self = this;
-      this.botx.controller.hears(this.patterns, 'direct_message,direct_mention,mention', function(bot, message) {
-        function loop(responses, index) {
+      this.botx.controller.hears(this.patterns, 'direct_message,direct_mention,mention', (bot, message) => {
+        let loop = (responses, index) => {
           if (index >= responses.length) return;
           let fn = responses[index];
           fn(bot, message);
           setTimeout(() => {loop(responses, index+ 1)}, 500);
-        }
-        loop(self.responses, 0);
+        };
+        loop(this.responses, 0);
       });
     }
   }
@@ -115,17 +114,21 @@ function conversationBuilder(botx) {
     bot: botx.bot,
     question: null,
     responses: [],
+
     ask: function(question) {
       this.question = question;
       return this;
     },
+
     when: function(pattern) {
       return conversationResponse(pattern, this)
     },
+
     addPatternAction: function(pattern, action) {
       this.responses.push({pattern: pattern, callback: action});
       return this;
     },
+
     otherwise: function(s) {
       let f = (response, conv) => {
         conv.say(s);
@@ -134,6 +137,7 @@ function conversationBuilder(botx) {
       this.responses.push({default: true, callback: f});
       return this;
     },
+
     create: function() {
       return (bot, message) => {
         bot.startConversation(message, (err, conv) => {
@@ -148,9 +152,11 @@ function conversationResponse(pattern, builder) {
   return {
     pattern: pattern,
     builder: builder,
+
     then: function(fn) {
       return builder.addPatternAction(this.pattern, fn)
     },
+
     thenSay: function(s) {
       let f = (response, conv) => {
         conv.say(s);
