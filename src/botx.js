@@ -8,71 +8,74 @@ var os = require('os');
 var Botkit = require('botkit');
 var scrape = require('scrape');
 
-
-
 const DEFAULT_CONFIG = {
   debug: true,
-  require_delivery: true
+  require_delivery: true,
+  shutdown: {
+    trigger: 'shutdown',
+    question: 'Are you sure?',
+    onYes: 'Shutting down...',
+    onNo: 'Continuing...'
+  }
 };
+
+module.exports = botx;
 
 function botx(userConfig = {}) {
   let config = Object.assign({}, DEFAULT_CONFIG, userConfig);
+ 
   let controller = Botkit.slackbot(config);
+ 
   let bot = controller.spawn({
     token: process.env.token
   }).startRTM();
 
-  respondToShutdown(controller);
-  
-  function respondToShutdown(controller) {
-    controller.hears(['shutdown'], 'direct_message,direct_mention,mention', function(bot, message) {
-
-      bot.startConversation(message, function(err, convo) {
-
-        convo.ask('Are you sure you want me to shutdown?', [
-          {
-            pattern: bot.utterances.yes,
-            callback: function(response, convo) {
-              convo.say('Bye!');
-              convo.next();
-              setTimeout(function() {
-                process.exit();
-              }, 3000);
-            }
-          },
-          {
-            pattern: bot.utterances.no,
-            default: true,
-            callback: function(response, convo) {
-              convo.say('*Phew!*');
-              convo.next();
-            }
-          }
-        ]);
-      });
-    });
-  }
-  
-  return {
+  let wrappedBot = {
     controller: controller,
     bot: bot,
-    whenBotHears: function(pattern)  {
+    whenBotHears(pattern) {
       return builder(this, pattern);
+    },
+    conversation() {
+      return conversationBuilder(this);
     }
+  };
+  
+  if (config.shutdown) {
+    installShutdownConversation(wrappedBot, config.shutdown);
   }
+  
+  return wrappedBot;
 }
 
+function installShutdownConversation(wrappedBot, shutdownConfig) {
+  let quitConversation = wrappedBot.conversation()
+    .ask(shutdownConfig.question)
+    .when('yes').then((response, conv) => {
+      conv.say(shutdownConfig.onYes);
+      conv.next();
+      setTimeout(function () {
+        process.exit();
+      }, 3000);
+    })
+    .otherwise(shutdownConfig.onNo)
+    .create();
+
+  wrappedBot.whenBotHears(shutdownConfig.trigger)
+    .thenStartConversation(quitConversation)
+    .go();
+}
 
 function builder(botx, pattern) {
   return {
     botx: botx,
     patterns: [pattern],
     responses: [],
-    orBotHears: function(anotherPattern) {
+    orBotHears(anotherPattern) {
       this.patterns.push(anotherPattern);
       return this;
     },
-    then: function(fn) {
+    then(fn) {
       this.responses.push(fn);
       return this;
     },
@@ -86,7 +89,12 @@ function builder(botx, pattern) {
         bot.reply(message, response);
       })
     },
-    go: function() {
+    
+    thenStartConversation(conversation) {
+      return this.then(conversation);
+    },
+
+    go() {
       let self = this;
       this.botx.controller.hears(this.patterns, 'direct_message,direct_mention,mention', function(bot, message) {
         function loop(responses, index) {
@@ -101,51 +109,55 @@ function builder(botx, pattern) {
   }
 }
 
-function main() {
-  let bot = botx();
-
-  bot.whenBotHears('hi')
-    .orBotHears('hello')
-    .thenReply('Well, hello there...')
-    .thenReply('How nice to see you again!')
-    .go();
-
-  bot.whenBotHears('say (.*)')
-    .orBotHears('repeat (.*)')
-    .thenReply('$1. I hope I said that right...')
-    .go();
-
-  bot.whenBotHears('reddit search (.+)')
-    .then(function(bot, message) {
-      scrape.request('http://www.reddit.com/search?q=' + message.match[1] , function (err, $) {
-        if (err) {
-          console.error(err);
-        }
-
-        var div = $('div.search-result-link').first();
-        var score = div.find('span.search-score').first();
-        var link = div.find('a.search-title').first();
-        console.log();
-        bot.reply(message, link.text + ' (' + score.text + ') ' + link.attribs.href);
-      });
-    })
-    .go();
-
-  bot.whenBotHears('reddit (hot|new|rising|controversial)')
-    .then(function(bot, message) {
-      scrape.request('http://www.reddit.com/' + message.match[1] , function (err, $) {
-        if (err) {
-          console.error(err);
-        }
-
-        var div = $('div.link').first();
-        var score = div.find('div.score.unvoted').first();
-        var link = div.find('a.title').first();
-        console.log();
-        bot.reply(message, link.text + ' (' + score.text + ') ' + link.attribs.href);
-      });
-    })
-    .go();
+function conversationBuilder(botx) {
+  return {
+    controller: botx.controller,
+    bot: botx.bot,
+    question: null,
+    responses: [],
+    ask: function(question) {
+      this.question = question;
+      return this;
+    },
+    when: function(pattern) {
+      return conversationResponse(pattern, this)
+    },
+    addPatternAction: function(pattern, action) {
+      this.responses.push({pattern: pattern, callback: action});
+      return this;
+    },
+    otherwise: function(s) {
+      let f = (response, conv) => {
+        conv.say(s);
+        conv.next();
+      };
+      this.responses.push({default: true, callback: f});
+      return this;
+    },
+    create: function() {
+      return (bot, message) => {
+        bot.startConversation(message, (err, conv) => {
+          conv.ask(this.question, this.responses)
+        });
+      }
+    }
+  }
 }
 
-main();
+function conversationResponse(pattern, builder) {
+  return {
+    pattern: pattern,
+    builder: builder,
+    then: function(fn) {
+      return builder.addPatternAction(this.pattern, fn)
+    },
+    thenSay: function(s) {
+      let f = (response, conv) => {
+        conv.say(s);
+        conv.next();
+      };
+      return builder.addPatternAction(this.pattern, f)
+    }
+  }
+}
+
