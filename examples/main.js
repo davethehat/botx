@@ -21,9 +21,9 @@ function main() {
     .thenSay('How nice to see you again!')
     .go();
 
-  bot.when('^say (.*)')
-    .or('^repeat (.*)')
-    .thenSay('$1. I hope I said that right...')
+  bot.when('^say (.+)')
+    .or('^repeat (.+)')
+    .thenSay('"$1"! I hope I said that right...')
     .go();
 
   let areWeGood = bot.conversation()
