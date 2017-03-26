@@ -6,6 +6,7 @@ if (!process.env.SLACK_API_TOKEN) {
 }
 
 const botx = require('../src/botx');
+const dig = require('../src/dig');
 
 main();
 
@@ -14,6 +15,15 @@ function main() {
   let bot = botx({
     token: process.env.SLACK_API_TOKEN
   });
+
+
+  bot.log.notice("Starting a new BOTX...");
+  // bot.log.info
+  // bot.log.error
+
+  bot.when('^help')
+    .thenSay('I can seach things for you!');
+
 
   bot.when('^hi')
     .or('^hello')
@@ -37,38 +47,58 @@ function main() {
     .thenStartConversation(areWeGood)
     .go();
 
-  
-  // This will be moved to another module, here for now
-  
-  bot.when('reddit search (.+)')
-    .then(function(bot, message) {
-      scrape.request('http://www.reddit.com/search?q=' + message.match[1] , function (err, $) {
-        if (err) {
-          console.error(err);
-        }
 
-        var div = $('div.search-result-link').first();
-        var score = div.find('span.search-score').first();
-        var link = div.find('a.search-title').first();
-        
-        bot.reply(message, link.text + ' (' + score.text + ') ' + link.attribs.href);
+  const pizza = bot.conversation()
+    .ask('Meat or veg?')
+    .when('meat').switchTo('meat_thread')
+    .when('veg').switchTo('veg_thread')
+
+    .ask('cheese?', 'veg_thread')
+    .when('yes').thenSay('Yay, cheese')
+    .when('no').thenSay('What, pizza without cheese? Sheesh...')
+
+    .ask('beef or ham?', 'meat_thread')
+    .when('beef').thenSay('Moooooooooo')
+    .when('ham').thenSay('At least, no pineapple..')
+
+    .create();
+
+  bot.when('pizza')
+    .thenStartConversation(pizza)
+    .go();
+
+
+
+  bot.when('^reddit search (.+)')
+    .then((b, message) => {
+      dig.reddit.search(message.match[1], (err, link) => {
+        bot.linkOrBust(err, message, link);
       });
     })
     .go();
 
-  bot.when('reddit (hot|new|rising|controversial)')
-    .then(function(bot, message) {
-      scrape.request('http://www.reddit.com/' + message.match[1] , function (err, $) {
-        if (err) {
-          console.error(err);
-        }
-
-        var div = $('div.link').first();
-        var score = div.find('div.score.unvoted').first();
-        var link = div.find('a.title').first();
-
-        bot.reply(message, link.text + ' (' + score.text + ') ' + link.attribs.href);
+  bot.when('^reddit (hot|new|rising|controversial)')
+    .then((b, message) => {
+      dig.reddit.category(message.match[1], (err, link) => {
+        bot.linkOrBust(err, message, link);
       });
     })
     .go();
+
+  bot.when('^twitter now')
+    .then((b, message) => {
+      dig.twitter.category('moments', (err, link) => {
+        bot.linkOrBust(err, message, link);
+      });
+    }).go();
+
+
+  bot.when('^twitter search (.+)')
+    .then((b, message) => {
+      const q = match[1];
+      dig.twitter.search(q, (err, link) => {
+        bot.linkOrBust(err, message, link);
+      });
+    }).go();
+
 }

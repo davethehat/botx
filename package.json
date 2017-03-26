@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "botkit": "^0.4.10",
-    "scrape": "^0.2.3"
+    "phantomjs": "^2.1.7",
+    "phantomjs-prebuilt": "^2.1.14",
+    "scraperjs": "^1.2.0"
   }
 }
