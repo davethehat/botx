@@ -18,23 +18,6 @@ function main() {
 
 
   bot.log.notice("Starting a new BOTX...");
-  // bot.log.info
-  // bot.log.error
-
-  bot.when('^help')
-    .thenSay('I can seach things for you!');
-
-
-  bot.when('^hi')
-    .or('^hello')
-    .thenSay('Well, hello there...')
-    .thenSay('How nice to see you again!')
-    .go();
-
-  bot.when('^say (.+)')
-    .or('^repeat (.+)')
-    .thenSay('"$1"! I hope I said that right...')
-    .go();
 
   let areWeGood = bot.conversation()
     .ask('Are we good?')
@@ -61,44 +44,15 @@ function main() {
     .when('beef').thenSay('Moooooooooo')
     .when('ham').thenSay('At least, no pineapple..')
 
+    .ask('chilli?', 'meat_thread')
+    .when('yes').thenSay('Hoooooooootttttttt!!!!!')
+    .when('no').thenSay('Wuss!')
+    .otherwise('I see you blow hot and cold...', 'meat_thread')
+
     .create();
 
   bot.when('pizza')
     .thenStartConversation(pizza)
     .go();
-
-
-
-  bot.when('^reddit search (.+)')
-    .then((b, message) => {
-      dig.reddit.search(message.match[1], (err, link) => {
-        bot.linkOrBust(err, message, link);
-      });
-    })
-    .go();
-
-  bot.when('^reddit (hot|new|rising|controversial)')
-    .then((b, message) => {
-      dig.reddit.category(message.match[1], (err, link) => {
-        bot.linkOrBust(err, message, link);
-      });
-    })
-    .go();
-
-  bot.when('^twitter now')
-    .then((b, message) => {
-      dig.twitter.category('moments', (err, link) => {
-        bot.linkOrBust(err, message, link);
-      });
-    }).go();
-
-
-  bot.when('^twitter search (.+)')
-    .then((b, message) => {
-      const q = match[1];
-      dig.twitter.search(q, (err, link) => {
-        bot.linkOrBust(err, message, link);
-      });
-    }).go();
 
 }

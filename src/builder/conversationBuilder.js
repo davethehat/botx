@@ -5,8 +5,6 @@ module.exports = conversationBuilder;
 const conversationResponse = require('./conversationResponse');
 
 
-
-
 function qthread() {
 
   return {
@@ -45,7 +43,7 @@ function conversationBuilder(botx) {
 
     ask(question, threadname = 'default') {
       this.currentThread = threadname;
-      let thread = this.threads[threadname] || qthread();
+      const thread = this.threads[threadname] || qthread();
 
       thread.question(question);
 
@@ -87,7 +85,9 @@ function conversationBuilder(botx) {
 
           Object.keys(this.threads).forEach(threadName => {
             const thread = this.threads[threadName];
-            conv.addQuestion(thread.question, thread.responses, {}, threadName);
+            thread.qandr.forEach(qandr => {
+              conv.addQuestion(qandr.question, qandr.responses, {}, threadName);
+            });
           });
 
           const defaultThread = this.threads['default'];
