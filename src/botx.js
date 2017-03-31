@@ -48,20 +48,20 @@ function botx(userConfig = {}) {
       }
     },
     
-    log: controller.log
+    log: controller.log,
+
+    utterances: bot.utterances
   };
   
-  if (config.shutdown) {
-    installShutdownConversation(wrappedBot, config.shutdown);
-  }
-  
+  installShutdownConversation(wrappedBot, config.shutdown);
+
   return wrappedBot;
 }
 
 function installShutdownConversation(wrappedBot, shutdownConfig) {
   const quitConversation = wrappedBot.conversation()
     .ask(shutdownConfig.question)
-    .when('yes').then((response, conv) => {
+    .when(wrappedBot.utterances.yes).then((response, conv) => {
       conv.say(shutdownConfig.onYes);
       conv.next();
       setTimeout(function () {

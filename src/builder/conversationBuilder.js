@@ -8,15 +8,20 @@ const conversationResponse = require('./conversationResponse');
 function qthread() {
 
   return {
-    qandr : [],
+    questions : [],
     current : null,
 
-    question(q) {
+    question(question, captureOptions) {
       this.current = {
-        question: q,
+        question: question,
+        captureOptions: captureOptions,
         responses: []
       };
-      this.qandr.push(this.current);
+      this.questions.push(this.current);
+    },
+
+    into(key) {
+      this.current.captureOptions = {key};
     },
 
     action(r) {
@@ -33,36 +38,34 @@ function conversationBuilder(botx) {
     question: null,
     responses: [],
     threads: {},
-    currentThread: 'default',
-
-    dump() {
-      console.log(this.question, this.responses);
-      console.log(this.threads);
-      return this;
-    },
+    currentThreadName: 'default',
 
     ask(question, threadname = 'default') {
-      this.currentThread = threadname;
-      const thread = this.threads[threadname] || qthread();
-
-      thread.question(question);
-
-      this.threads[threadname] = thread;
-
+      const thread = this._switchToThread(threadname);
+      thread.question(question, {key: threadname});
       return this;
     },
 
-    thenAsk(question) {
+    into(key) {
+      this.threads[this.currentThreadName].into(key);
       return this;
     },
 
     inThread(threadname) {
-      this.currentThread = threadname;
+      this._switchToThread(threadname);
       return this;
     },
 
+    _switchToThread(threadname) {
+      if (!this.threads[threadname]) {
+        this.threads[threadname] = qthread();
+      }
+      this.currentThreadName = threadname;
+      return this.threads[threadname];
+    },
+
     when(pattern) {
-      return conversationResponse(pattern, this.currentThread, this)
+      return conversationResponse(pattern, this.currentThreadName, this)
     },
 
     addPatternAction(pattern, threadname, action) {
@@ -79,21 +82,30 @@ function conversationBuilder(botx) {
       return this;
     },
 
+    afterwards(fn) {
+      this.onEnd = fn;
+      return this;
+    },
+
     create() {
       return (bot, message) => {
         bot.createConversation(message, (err, conv) => {
 
           Object.keys(this.threads).forEach(threadName => {
             const thread = this.threads[threadName];
-            thread.qandr.forEach(qandr => {
-              conv.addQuestion(qandr.question, qandr.responses, {}, threadName);
+            thread.questions.forEach(qandr => {
+              conv.addQuestion(qandr.question, qandr.responses, qandr.captureOptions, threadName);
             });
           });
 
           const defaultThread = this.threads['default'];
 
-          conv.ask(defaultThread.qandr[0].question, defaultThread.qandr[0].responses);
-          
+          conv.ask(defaultThread.questions[0].question, defaultThread.questions[0].responses, defaultThread.questions[0].captureOptions);
+
+          if (this.onEnd) {
+            conv.on('end', this.onEnd);
+          }
+
           conv.activate();
         });
       }
