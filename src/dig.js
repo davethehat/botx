@@ -1,7 +1,4 @@
-'use strict';
-
 const URL = require('url');
-
 const _ = require('lodash');
 const scraperjs = require('scraperjs');
 
@@ -87,19 +84,21 @@ const twitterConfig = {
 class Dig {
   constructor(config) {
     this.config = _.merge({}, config);
+    this.boundSearch = this.search.bind(this);
+    this.boundCategory = this.category.bind(this);
   }
 
-  category(term, cb) {
+  category(term, ok, error) {
     const url = `${this.config.url}/${this.config.category.locator.replace('{}', term)}`;
-    this.scrapeLink(this.config.category.selectors, 'href', url, cb);
+    this.scrapeLink(this.config.category.selectors, 'href', url, ok, error);
   }
 
-  search(term, cb) {
+  search(term, ok, error) {
     const url = `${this.config.url}/${this.config.search.locator.replace('{}', term)}`;
-    this.scrapeLink(this.config.search.selectors, this.config.search.href || 'href', url, cb);
+    this.scrapeLink(this.config.search.selectors, this.config.search.href || 'href', url, ok, error);
   }
 
-  scrapeLink(selectors, href, url, cb) {
+  scrapeLink(selectors, href, url, ok, error) {
     scraperjs.StaticScraper.create(url)
       .scrape($ => {
 
@@ -142,14 +141,14 @@ class Dig {
 
         return ret;
       })
-      .then(element => cb(null, element))
-      .catch(err => cb(err, null));
+      .then(ok)
+      .catch(error);
   }
 
 }
 
 module.exports = {
-  reddit: new Dig(redditConfig),
+  reddit:  new Dig(redditConfig),
   twitter: new Dig(twitterConfig),
   youtube: new Dig(youtubeConfig)
 };
@@ -161,11 +160,6 @@ function addDomain(url, href) {
 }
 
 if (!module.parent) {
-  main();
-}
-
-
-function main() {
   const args = process.argv.slice(2);
   console.log(args);
 

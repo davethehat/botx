@@ -13,6 +13,7 @@
     "botkit": "^0.4.10",
     "phantomjs": "^2.1.7",
     "phantomjs-prebuilt": "^2.1.14",
-    "scraperjs": "^1.2.0"
+    "scraperjs": "^1.2.0",
+    "lodash": "latest"
   }
 }

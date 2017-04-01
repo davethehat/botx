@@ -1,38 +1,26 @@
 'use strict';
 
-if (!process.env.SLACK_API_TOKEN) {
-  console.log('Error: Specify token in environment: SLACK_API_TOKEN');
-  process.exit(1);
-}
-
 const botx = require('../src/botx');
-const util = require("util");
+let bot = botx({
+  help: {
+    messages: [
+      'I can capture your pizza order!',
+      'If you say "pizza" I\'ll help you choose something.'
+    ]
+  }
+});
 
-main();
+bot.log.notice("Starting a new BOTX...");
 
-function main() {
+const order = 'OK, got your order: {{responses.base}} {{responses.type}} pizza {{responses.toppings}} topping';
 
-  let bot = botx({
-    token: process.env.SLACK_API_TOKEN
-  });
+const pizza = bot.conversation()
+  .ask('What sort?').into('type')     .when('.*') .switchTo('base')
+  .ask('Thin or deep?', 'base')       .when('.*') .switchTo('toppings')
+  .ask('Toppings?',     'toppings')   .when('.*') .thenSay(order)
+  .create(responses => console.log(responses));
 
-
-  bot.log.notice("Starting a new BOTX...");
-  
-  const pizza = bot.conversation()
-    .ask('What sort?', 'default').into('type').when('.*').switchTo('base')
-    .ask('Thin or deep?', 'base').into('base').when('.*').switchTo('toppings')
-    .ask('Toppings?', 'toppings').into('toppings').when('.*')
-    .thenSay('OK, got your order: {{responses.base}} {{responses.type}} pizza with {{responses.toppings}} topping')
-    .afterwards(conv => {
-      const results = conv.extractResponses();
-      bot.log(util.inspect(results));
-    })
-    .create();
-
-  bot.when('pizza')
-    .thenStartConversation(pizza)
-    .go();
-
-}
+bot.when('pizza')
+  .thenStartConversation(pizza)
+  .go();
 
