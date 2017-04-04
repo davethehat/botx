@@ -2,7 +2,7 @@
 
 const botx = require('../src/botx');
 
-let bot = botx({
+const bot = botx({
   help: {
     messages: [
       'I\'m a slightly insecure bot...',

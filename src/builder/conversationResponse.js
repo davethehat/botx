@@ -1,26 +1,27 @@
-'use strict';
+class ConversationResponse {
+  constructor(pattern, threadname, builder) {
+    this.pattern = pattern;
+    this.threadname = threadname;
+    this.builder = builder;
+  }
+  switchTo(newThreadname) {
+    let fn = (response, conv) => {
+      conv.gotoThread(newThreadname);
+    };
+    return this.builder.addPatternAction(this.pattern, this.threadname, fn);
+  }
 
-module.exports = conversationResponse;
+  then(fn) {
+    return this.builder.addPatternAction(this.pattern, this.threadname, fn)
+  }
 
-function conversationResponse(pattern, threadname, builder) {
-  return {
-    switchTo: function(newThreadname) {
-      let f = (response, conv) => {
-        conv.gotoThread(newThreadname);
-      };
-      return builder.addPatternAction(pattern, threadname, f);
-    },
-
-    then: function(fn) {
-      return builder.addPatternAction(pattern, threadname, fn)
-    },
-
-    thenSay: function(s, action = 'next') {
-      let f = (response, conv) => {
-        conv.say(s);
-        conv[action]();
-      };
-      return builder.addPatternAction(pattern, threadname, f)
-    }
+  thenSay(s, action = 'next') {
+    let fn = (response, conv) => {
+      conv.say(s);
+      conv[action]();
+    };
+    return this.builder.addPatternAction(this.pattern, this.threadname, fn)
   }
 }
+
+module.exports = ConversationResponse;

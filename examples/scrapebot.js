@@ -3,7 +3,7 @@
 const botx = require('../src/botx');
 const dig = require('../src/dig');
 
-let bot = botx({
+const bot = botx({
   token: process.env.SLACK_API_TOKEN,
   help: {
     messages: [

@@ -1,7 +1,8 @@
 'use strict';
 
 const botx = require('../src/botx');
-let bot = botx({
+
+const bot = botx({
   help: {
     messages: [
       'I can capture your pizza order!',
