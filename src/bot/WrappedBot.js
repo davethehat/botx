@@ -16,6 +16,14 @@ class WrappedBot {
     return new Builder(this, pattern);
   }
 
+  say(what) {
+    this.bot.say(what);
+  }
+  
+  reply(message, what) {
+    this.bot.reply(message, what);
+  }
+
   conversation() {
     return new ConversationBuilder(this);
   }

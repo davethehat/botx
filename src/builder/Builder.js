@@ -19,7 +19,7 @@ class Builder {
 
   thenSay(what) {
     return this.then((bot, message) => {
-      let response = what;
+      let response = Array.isArray(what) ? chooseFrom(what) : what;
       for (let matchIndex = 1; matchIndex <= message.match.length; matchIndex++) {
         const re = new RegExp(`\\{\\{${matchIndex}\\}\\}`, 'g');
         response = response.replace(re, message.match[matchIndex]);
@@ -42,8 +42,8 @@ class Builder {
     return this.then(conversation);
   }
 
-  go() {
-    this.botx.controller.hears(this.patterns, 'direct_message,direct_mention,mention', (bot, message) => {
+  go(events = ['direct_message','direct_mention','mention']) {
+    this.botx.controller.hears(this.patterns, events, (bot, message) => {
       const loop = (responses, index) => {
         if (index >= responses.length) return;
         const fn = responses[index];
@@ -53,6 +53,10 @@ class Builder {
       loop(this.responses, 0);
     });
   }
+}
+
+function chooseFrom(array) {
+  return array[Math.floor(Math.random() * array.length)];
 }
 
 module.exports = Builder;
