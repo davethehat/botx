@@ -1,5 +1,7 @@
 const RESPONSE_DELAY = 1000;
 
+const util = require('../util/util');
+
 class Builder {
   constructor(botx, pattern) {
     this.botx = botx;
@@ -19,7 +21,7 @@ class Builder {
 
   thenSay(what) {
     return this.then((bot, message) => {
-      let response = Array.isArray(what) ? chooseFrom(what) : what;
+      let response = Array.isArray(what) ? util.chooseFrom(what) : what;
       for (let matchIndex = 1; matchIndex <= message.match.length; matchIndex++) {
         const re = new RegExp(`\\{\\{${matchIndex}\\}\\}`, 'g');
         response = response.replace(re, message.match[matchIndex]);
@@ -53,10 +55,6 @@ class Builder {
       loop(this.responses, 0);
     });
   }
-}
-
-function chooseFrom(array) {
-  return array[Math.floor(Math.random() * array.length)];
 }
 
 module.exports = Builder;

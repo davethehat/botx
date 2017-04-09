@@ -1,3 +1,5 @@
+const util = require('../util/util');
+
 class ConversationResponse {
   constructor(pattern, threadname, builder) {
     this.pattern = pattern;
@@ -17,7 +19,7 @@ class ConversationResponse {
 
   thenSay(s, action = 'next') {
     let fn = (response, conv) => {
-      conv.say(s);
+      conv.say(Array.isArray(s) ? util.chooseFrom(s) : s);
       conv[action]();
     };
     return this.builder.addPatternAction(this.pattern, this.threadname, fn)

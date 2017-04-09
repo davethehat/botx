@@ -26,7 +26,7 @@ bot.when(/^call me (\w+)/)
 bot.when(/^hi/)
   .or(/^hello/)
   .then((b, m) => {
-    b.reply(m, 'Well hi there, ' + name + '.');
+    b.reply(m, `Well hi there, ${name}.`);
   })
   .go();
 

@@ -19,7 +19,7 @@ const pizza = bot.conversation()
   .ask('What sort?').into('type')     .when('.*') .switchTo('base')
   .ask('Thin or deep?', 'base')       .when('.*') .switchTo('toppings')
   .ask('Toppings?',     'toppings')   .when('.*') .thenSay(order)
-  .create(responses => console.log(responses));
+  .create((responses) => console.log(responses));
 
 bot.when('pizza')
   .thenStartConversation(pizza)
