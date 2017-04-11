@@ -29,11 +29,3 @@ bot.when(/^hi/)
     b.reply(m, `Well hi there, ${name}.`);
   })
   .go();
-
-
-bot.when(/^now/)
-  .then((b,m) => {
-    //const reply = `<!date^${m.ts}^It's {time} on {date}|Sorry, I can't work out what time it is...>`;
-    b.reply(m, new Date().toString());
-  })
-  .go();
