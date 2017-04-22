@@ -19,9 +19,9 @@ class Builder {
     return this;
   }
 
-  thenSay(what) {
+  thenSay(...what) {
     return this.then((bot, message) => {
-      let response = Array.isArray(what) ? util.chooseFrom(what) : what;
+      let response = util.chooseFrom(what);
       for (let matchIndex = 1; matchIndex <= message.match.length; matchIndex++) {
         const re = new RegExp(`\\{\\{${matchIndex}\\}\\}`, 'g');
         response = response.replace(re, message.match[matchIndex]);

@@ -17,7 +17,7 @@ bot.log.notice("Starting a new BOTX...");
 bot.when('^hi')
   .or('^hello')
   .thenSay('Well, hello there...')
-  .thenSay(['How nice to see you again!','It\'s been a while!','What are you doing around these parts?'])
+  .thenSay('How nice to see you again!','It\'s been a while!','What are you doing around these parts?')
   .go();
 
 bot.when('^say (.+)')
