@@ -3,6 +3,7 @@
 const botx = require('../src/botx');
 
 const bot = botx({
+  name: 'Make me a pizza bot',
   help: {
     messages: [
       'I can capture your pizza order!',
@@ -10,8 +11,6 @@ const bot = botx({
     ]
   }
 });
-
-bot.log.notice("Starting a new BOTX...");
 
 const order = 'OK, got your order: {{responses.base}} {{responses.type}} pizza {{responses.toppings}} topping';
 

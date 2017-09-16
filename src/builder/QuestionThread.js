@@ -14,11 +14,11 @@ class QuestionThread {
   }
 
   into(key) {
-    this.current.captureOptions = {key};
+    this.current.captureOptions = { key };
   }
 
-  action(r) {
-    this.current.responses.push(r);
+  action(response) {
+    this.current.responses.push(response);
   }
 }
 

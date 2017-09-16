@@ -4,7 +4,7 @@ const botx = require('../src/botx');
 const dig = require('../src/dig');
 
 const bot = botx({
-  token: process.env.SLACK_API_TOKEN,
+  name: 'Scrapebot',
   help: {
     messages: [
       'I can search things for you!',
@@ -20,8 +20,6 @@ const bot = botx({
     ]
   }
 });
-
-bot.log.notice('Starting a new BOTX...');
 
 bot.when('^reddit search (.+)')
   .thenCallWithOneMatch(dig.reddit.boundSearch, bot.link)

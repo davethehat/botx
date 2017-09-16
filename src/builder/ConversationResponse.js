@@ -1,4 +1,4 @@
-const util = require('../util/util');
+const { chooseFrom } = require('../util/util');
 
 class ConversationResponse {
   constructor(pattern, threadname, builder) {
@@ -6,22 +6,27 @@ class ConversationResponse {
     this.threadname = threadname;
     this.builder = builder;
   }
-  switchTo(newThreadname) {
-    let fn = (response, conv) => {
-      conv.gotoThread(newThreadname);
+
+  switchTo(newThreadName) {
+    const fn = (response, conv) => {
+      conv.gotoThread(newThreadName);
     };
-    return this.builder.addPatternAction(this.pattern, this.threadname, fn);
+    return this.then(fn);
+  }
+
+  thenSay(...responses) {
+    this.thenSayWithAction(responses, 'next')
+  }
+
+  thenSayWithAction(responses, action) {
+    const fn = (response, conv) => {
+      conv.say(chooseFrom(responses));
+      conv[action]();
+    };
+    return this.then(fn);
   }
 
   then(fn) {
-    return this.builder.addPatternAction(this.pattern, this.threadname, fn)
-  }
-
-  thenSay(s, action = 'next') {
-    let fn = (response, conv) => {
-      conv.say(Array.isArray(s) ? util.chooseFrom(s) : s);
-      conv[action]();
-    };
     return this.builder.addPatternAction(this.pattern, this.threadname, fn)
   }
 }

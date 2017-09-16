@@ -1,5 +1,6 @@
 const ConversationResponse = require('./ConversationResponse');
 const QuestionThread = require('./QuestionThread');
+const { nullFunction } = require('../util/util');
 
 class ConversationBuilder {
   constructor(botx) {
@@ -37,8 +38,7 @@ class ConversationBuilder {
     return this;
   }
   
-  create(fn = () => {}) {
-
+  create(fn = nullFunction) {
     this.onCompletion = conv => {
       fn(conv.extractResponses(), this.botx)
     };

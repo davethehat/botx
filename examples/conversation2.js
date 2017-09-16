@@ -3,6 +3,7 @@
 const botx = require('../src/botx');
 
 const bot = botx({
+  name: 'Pizzabot',
   help: {
     messages: [
       'Let\'s talk about pizza!',
@@ -10,9 +11,6 @@ const bot = botx({
     ]
   }
 });
-
-
-bot.log.notice("Starting a new BOTX...");
 
 const pizza = bot.conversation()
   .ask('Meat or veg?')

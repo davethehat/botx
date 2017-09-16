@@ -1,6 +1,6 @@
-const RESPONSE_DELAY = 1000;
+const { chooseFrom } = require('../util/util');
 
-const util = require('../util/util');
+const RESPONSE_DELAY = 1000;
 
 class Builder {
   constructor(botx, pattern) {
@@ -19,9 +19,9 @@ class Builder {
     return this;
   }
 
-  thenSay(what) {
+  thenSay(...what) {
     return this.then((bot, message) => {
-      let response = Array.isArray(what) ? util.chooseFrom(what) : what;
+      let response = chooseFrom(what);
       for (let matchIndex = 1; matchIndex <= message.match.length; matchIndex++) {
         const re = new RegExp(`\\{\\{${matchIndex}\\}\\}`, 'g');
         response = response.replace(re, message.match[matchIndex]);
@@ -33,7 +33,7 @@ class Builder {
   thenCallWithOneMatch(fn, ok, error) {
     return this.then((bot, message) => {
       const match = ok.match || message.match[1];
-      const cbOK = ok.ok|| ok;
+      const cbOK = ok.ok || ok;
       const cbError = ok.error || error || this.botx.error;
 
       fn(match, cbOK(bot, message), cbError(bot, message));

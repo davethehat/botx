@@ -2,7 +2,8 @@
 
 const botx = require('../src/botx');
 
-let bot = botx({
+const bot = botx({
+  name: 'Simplebot',
   help: {
     messages: [
       'I am but a simple bot...',
@@ -11,8 +12,6 @@ let bot = botx({
     ]
   }
 });
-
-bot.log.notice("Starting a new BOTX...");
 
 bot.when('^hi')
   .or('^hello')

@@ -1,11 +1,12 @@
 'use strict';
 
 const botkit = require('botkit');
-const _ = require('lodash');
+const { merge } = require('lodash');
 
 const WrappedBot = require('./bot/WrappedBot');
 
 const DEFAULT_CONFIG = {
+  name: 'BOTX bot',
   debug: false,
   require_delivery: true,
   stats_optout: true,
@@ -23,7 +24,7 @@ const DEFAULT_CONFIG = {
 };
 
 function botx(userConfig = {}) {
-  const config = _.merge({}, DEFAULT_CONFIG, userConfig);
+  const config = merge({}, DEFAULT_CONFIG, userConfig);
   const controller = botkit.slackbot(config);
 
   config.token = config.token || process.env.SLACK_API_TOKEN;
@@ -41,11 +42,14 @@ function botx(userConfig = {}) {
   installShutdownConversation(wrappedBot);
   installHelp(wrappedBot);
 
+  wrappedBot.log.notice(`${config.name} starting...`);
+
   return wrappedBot;
 }
 
 function installShutdownConversation(wrappedBot) {
   const shutdownConfig = wrappedBot.config.shutdown;
+  
   const quitConversation = wrappedBot.conversation()
     .ask(shutdownConfig.question)
     .when(wrappedBot.utterances.yes).then((response, conv) => {
