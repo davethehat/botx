@@ -1,4 +1,5 @@
 node_modules
 .idea
-config
+config/bot.js
 npm-debug.log
+.DS_Store

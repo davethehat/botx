@@ -2,24 +2,23 @@
 
 const botx = require('../src/botx');
 
-let bot = botx({
+const bot = botx({
+  name: 'Simplebot',
   help: {
     messages: [
       'I am but a simple bot...',
       'Say "hello" or "hi" to me, or',
-      'ask me to say or repeat something.' 
+      'ask me to say or repeat something.'
     ]
   }
 });
 
-bot.log.notice("Starting a new BOTX...");
-
 bot.when('^hi')
   .or('^hello')
   .thenSay('Well, hello there...')
-  .thenSay(['How nice to see you again!',
+  .thenSay('How nice to see you again!',
     'It\'s been a while!',
-    'What are you doing around these parts?'])
+    'What are you doing around these parts?')
   .go();
 
 bot.when('^say (.+)')

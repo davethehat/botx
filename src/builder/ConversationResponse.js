@@ -1,9 +1,9 @@
 const { chooseFrom } = require('../util/util');
 
 class ConversationResponse {
-  constructor(pattern, threadname, builder) {
+  constructor(pattern, threadName, builder) {
     this.pattern = pattern;
-    this.threadname = threadname;
+    this.threadName = threadName;
     this.builder = builder;
   }
 
@@ -15,7 +15,7 @@ class ConversationResponse {
   }
 
   thenSay(...responses) {
-    this.thenSayWithAction(responses, 'next')
+    return this.thenSayWithAction(responses, 'next')
   }
 
   thenSayWithAction(responses, action) {
@@ -27,7 +27,7 @@ class ConversationResponse {
   }
 
   then(fn) {
-    return this.builder.addPatternAction(this.pattern, this.threadname, fn)
+    return this.builder.addPatternAction(this.pattern, this.threadName, fn)
   }
 }
 

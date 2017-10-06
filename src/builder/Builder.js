@@ -3,8 +3,8 @@ const { chooseFrom } = require('../util/util');
 const RESPONSE_DELAY = 1000;
 
 class Builder {
-  constructor(botx, pattern) {
-    this.botx = botx;
+  constructor(wrappedBot, pattern) {
+    this.wrappedBot = wrappedBot;
     this.patterns = [pattern];
     this.responses = [];
   }
@@ -34,7 +34,7 @@ class Builder {
     return this.then((bot, message) => {
       const match = ok.match || message.match[1];
       const cbOK = ok.ok || ok;
-      const cbError = ok.error || error || this.botx.error;
+      const cbError = ok.error || error || this.wrappedBot.error;
 
       fn(match, cbOK(bot, message), cbError(bot, message));
     })
@@ -45,7 +45,7 @@ class Builder {
   }
 
   go(events = ['direct_message','direct_mention','mention']) {
-    this.botx.controller.hears(this.patterns, events, (bot, message) => {
+    this.wrappedBot.hears(this.patterns, events, (bot, message) => {
       const loop = (responses, index) => {
         if (index >= responses.length) return;
         const fn = responses[index];

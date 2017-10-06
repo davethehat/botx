@@ -3,6 +3,7 @@
 const botx = require('../src/botx');
 
 let bot = botx({
+  name: 'MemoryBot',
   help: {
     messages: [
       'I am a bot with a small memory...',
@@ -13,8 +14,6 @@ let bot = botx({
 });
 
 let name = 'friend';
-
-bot.log.notice("Starting a new BOTX...");
 
 bot.when(/^call me (\w+)/)
   .then((b, message) => {
@@ -27,13 +26,5 @@ bot.when(/^hi/)
   .or(/^hello/)
   .then((b, m) => {
     b.reply(m, `Well hi there, ${name}.`);
-  })
-  .go();
-
-
-bot.when(/^now/)
-  .then((b,m) => {
-    //const reply = `<!date^${m.ts}^It's {time} on {date}|Sorry, I can't work out what time it is...>`;
-    b.reply(m, new Date().toString());
   })
   .go();

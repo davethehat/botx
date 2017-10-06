@@ -38,5 +38,16 @@ bot.when('^say (.+)')
 
 That's all it takes...
 
-Note you will need to place your Slack API token in the environment *SLACK_API_TOKEN*
+To use with Slack, you'll need to create a slack Bot user. Once you've done that, to run your bot directly from 
+node you will need to place your Slack API token in the environment *SLACK_API_TOKEN*. Alternatively, copy the 
+file `config/bot.template.js` to `config/bot.js`, and replace the template text in the file with your token, then 
+run your bot using:
+
+```
+$ npm run bot <path-to-your-bot>
+```
+
+The workbook used in the workshop can be found in the `doc` directory: it includes all exercises, and instructions on 
+setting up a Slack account and bot user, and creating a Cloud9 IDE account (used in the workshop, although you can of
+course install node.js on your own computer and use your favourite editor/IDE as you wish).
 

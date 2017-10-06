@@ -2,4 +2,5 @@
 
 const botx = require('../src/botx');
   
-botx();
+const bot = botx();
+bot.start();

@@ -15,7 +15,7 @@ const bot = botx({
 const areWeGood = bot.conversation()
   .ask('Are we good?')
   .when('yes').thenSay('I\'m so glad we are friends!')
-  .when('no').thenSay(['Aww, and there I was hoping...','Oh dear, that makes me sad...'])
+  .when('no').thenSay('Aww, and there I was hoping...','Oh dear, that makes me sad...')
   .otherwise('Well, maybe there\'s hope for me yet')
   .create();
 

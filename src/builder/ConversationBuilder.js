@@ -3,8 +3,8 @@ const QuestionThread = require('./QuestionThread');
 const { nullFunction } = require('../util/util');
 
 class ConversationBuilder {
-  constructor(botx) {
-    this.botx = botx;
+  constructor(wrappedBot) {
+    this.wrappedBot = wrappedBot;
     this.threads = {};
     this.currentThreadName = 'default';
   }
@@ -40,7 +40,7 @@ class ConversationBuilder {
   
   create(fn = nullFunction) {
     this.onCompletion = conv => {
-      fn(conv.extractResponses(), this.botx)
+      fn(conv.extractResponses(), this.wrappedBot)
     };
     
     return (bot, message) => {

@@ -3,16 +3,14 @@
 const botx = require('../src/botx');
 
 const bot = botx({
+  name: 'Needybot',
   help: {
     messages: [
-      'I\'m a slightly insecure bot...',
+      'I\'m a slightly needy bot...',
       'I respond to "good" - please be nice to me!'
     ]
   }
 });
-
-
-bot.log.notice("Starting a new BOTX...");
 
 const areWeGood = bot.conversation()
   .ask('Are we good?')

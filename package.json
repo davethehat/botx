@@ -4,14 +4,14 @@
   "description": "Playing with botkit API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node ./test",
     "start": "node examples/main.js",
     "bot": "node -r ./config/bot"
   },
   "author": "david.harvey@teamsandtechnology.com",
   "license": "ISC",
   "dependencies": {
-    "botkit": "^0.4.10",
+    "botkit": "^0.6.3",
     "phantomjs": "^2.1.7",
     "phantomjs-prebuilt": "^2.1.14",
     "scraperjs": "^1.2.0",
