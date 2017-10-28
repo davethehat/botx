@@ -1,53 +1,30 @@
 'use strict';
 
 const assert = require('assert');
-
+const sinon = require('sinon');
 const WrappedBot = require('../src/bot/WrappedBot');
 
-function beforeEach() {
 
-}
+describe('WrappedBot', () => {
 
-function shouldCallLogOnStart() {
+  describe('start', () => {
 
-  const config = {
-    name: 'unit-test-bot'
-  };
+    it('should call log', () => {
+      const config = {
+        name: 'unit-test-bot'
+      };
 
-  const mockAdapter = {
-    lastNoticeMessage: '',
-    log : {
-      notice(message) {
-        this.lastNoticeMessage = message;
-      }
-    }
-  };
+      const log = { notice() {}};
+      const mockLog = sinon.mock(log);
 
-  const bot = new WrappedBot(config, mockAdapter);
-  bot.start();
+      mockLog.expects('notice').once();
 
-  assert.ok(mockAdapter.lastNoticeMessage.match(new RegExp(`${config.name}`)));
-}
+      const bot = new WrappedBot(config, {log});
+      bot.start();
 
-function shouldInstallShutdownConversationIfPresent() {
-  const config = {
-    name: 'unit-test-bot',
-    shutdown: {
-      trigger: 'shutdown',
-      question: 'Are you sure?',
-      onYes: 'Shutting down...',
-      onNo: 'Continuing...'
-    }
-  };
+      mockLog.verify();
 
-}
-
-
-
-function runTests() {
-  shouldCallLogOnStart();
-}
-
-runTests();
-
+    })
+  });
+});
 

@@ -13,6 +13,8 @@ const bot = botx({
   }
 });
 
+bot.start();
+
 bot.when('^hi')
   .or('^hello')
   .thenSay('Well, hello there...')

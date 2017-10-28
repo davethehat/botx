@@ -4,7 +4,7 @@
   "description": "Playing with botkit API",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test",
+    "test": "./node_modules/mocha/bin/mocha",
     "start": "node examples/main.js",
     "bot": "node -r ./config/bot"
   },

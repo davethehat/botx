@@ -13,6 +13,8 @@ let bot = botx({
   }
 });
 
+bot.start();
+
 let name = 'friend';
 
 bot.when(/^call me (\w+)/)

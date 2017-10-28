@@ -12,6 +12,8 @@ const bot = botx({
   }
 });
 
+bot.start();
+
 const areWeGood = bot.conversation()
   .ask('Are we good?')
   .when('yes').thenSay('I\'m so glad we are friends!')
