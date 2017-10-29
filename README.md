@@ -11,7 +11,7 @@ A simple example:
 
 const botx = require('../src/botx');
 
-let bot = botx({
+const bot = botx({
   help: {
     messages: [
       'I am but a simple bot...',
@@ -21,7 +21,7 @@ let bot = botx({
   }
 });
 
-bot.log.notice("Starting a new BOTX...");
+bot.start();
 
 bot.when('^hi')
   .or('^hello')
