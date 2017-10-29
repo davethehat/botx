@@ -16,5 +16,10 @@
     "phantomjs-prebuilt": "^2.1.14",
     "scraperjs": "^1.2.0",
     "lodash": "latest"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "sinon": "^4.0.2"
   }
 }
