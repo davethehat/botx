@@ -12,6 +12,8 @@ const bot = botx({
   }
 });
 
+bot.start();
+
 const order = 'OK, got your order: {{responses.base}} {{responses.type}} pizza, {{responses.toppings}} topping';
 
 const pizza = bot.conversation()

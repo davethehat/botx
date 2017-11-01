@@ -21,6 +21,8 @@ const bot = botx({
   }
 });
 
+bot.start();
+
 bot.when('^reddit search (.+)')
   .thenCallWithOneMatch(dig.reddit.boundSearch, bot.link)
   .go();

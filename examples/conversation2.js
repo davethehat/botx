@@ -12,6 +12,8 @@ const bot = botx({
   }
 });
 
+bot.start();
+
 const pizza = bot.conversation()
   .ask('Meat or veg?')
   .when('meat').switchTo('meat')
